@@ -1,0 +1,3271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShowReady - Gestão de Pré-Produção</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.3s ease-out;
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Gradients */
+        .gradient-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .gradient-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .gradient-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .gradient-teal { background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); }
+        
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Enhanced shadows */
+        .shadow-soft { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        .shadow-medium { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); }
+        .shadow-strong { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); }
+        
+        /* Hover effects */
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hover-glow {
+            transition: all 0.3s ease;
+        }
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+        
+        /* Enhanced buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-primary:hover:before {
+            left: 100%;
+        }
+        
+        /* Enhanced cards */
+        .card-enhanced {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .card-enhanced:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Status indicators */
+        .status-indicator {
+            position: relative;
+            display: inline-block;
+        }
+        .status-indicator:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .status-ok:before { background: #10b981; }
+        .status-warning:before { background: #f59e0b; }
+        .status-error:before { background: #ef4444; }
+        
+        /* Pulse animation for notifications */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Dark theme enhancements */
+        .dark {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e5e5e5;
+        }
+        .dark .card-enhanced {
+            background: rgba(45, 45, 45, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark .glass {
+            background: rgba(45, 45, 45, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark .bg-gray-50 { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .dark .bg-white { background: rgba(45, 45, 45, 0.95); }
+        .dark .bg-gray-100 { background: rgba(60, 60, 60, 0.8); }
+        .dark .text-gray-800 { color: #e5e5e5; }
+        .dark .text-gray-600 { color: #b3b3b3; }
+        .dark .text-gray-500 { color: #9ca3af; }
+        .dark .border-gray-300 { border-color: rgba(255, 255, 255, 0.1); }
+        
+        /* Loading states */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+        .loading:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        /* Enhanced form inputs */
+        .input-enhanced {
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            color: #1f2937;
+        }
+        .input-enhanced:focus {
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Dark theme form inputs */
+        .dark .input-enhanced {
+            background: rgba(55, 65, 81, 0.95);
+            border: 2px solid rgba(75, 85, 99, 0.5);
+            color: #f9fafb;
+        }
+        .dark .input-enhanced:focus {
+            background: rgba(55, 65, 81, 1);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        .dark .input-enhanced::placeholder {
+            color: #9ca3af;
+        }
+        
+        /* Dark theme regular inputs */
+        .dark input[type="text"],
+        .dark input[type="email"],
+        .dark input[type="tel"],
+        .dark input[type="number"],
+        .dark input[type="date"],
+        .dark select,
+        .dark textarea {
+            background: rgba(55, 65, 81, 0.95);
+            border: 2px solid rgba(75, 85, 99, 0.5);
+            color: #f9fafb;
+        }
+        .dark input[type="text"]:focus,
+        .dark input[type="email"]:focus,
+        .dark input[type="tel"]:focus,
+        .dark input[type="number"]:focus,
+        .dark input[type="date"]:focus,
+        .dark select:focus,
+        .dark textarea:focus {
+            background: rgba(55, 65, 81, 1);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        .dark input::placeholder,
+        .dark textarea::placeholder {
+            color: #9ca3af;
+        }
+        
+        /* Progress bars */
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 6px;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-primary text-white shadow-strong backdrop-blur-lg relative">
+        <div class="absolute inset-0 bg-white bg-opacity-10"></div>
+        <div class="container mx-auto px-6 py-6 relative z-10">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 fade-in">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-lg rounded-xl flex items-center justify-center border border-white border-opacity-30 hover-glow">
+                        <span class="text-3xl">🎯</span>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">ShowReady</h1>
+                        <p class="text-blue-100 text-sm font-medium">Gestão Inteligente de Eventos</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-2 items-center">
+                    <button onclick="showSection('dashboard')" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 font-medium">
+                        📊 Dashboard
+                    </button>
+                    <button onclick="showSection('events')" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 font-medium">
+                        📅 Eventos
+                    </button>
+                    <button onclick="showSection('auditors')" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 font-medium">
+                        👥 Auditores
+                    </button>
+                    <button onclick="showSection('marketplace')" class="px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 font-medium">
+                        🛒 Marketplace
+                    </button>
+                    <div class="w-px h-6 bg-white bg-opacity-30 mx-2"></div>
+                    <button onclick="toggleTheme()" class="px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 text-sm" id="themeToggle">
+                        🌙 Escuro
+                    </button>
+                    <button onclick="clearAllData()" class="px-3 py-2 rounded-lg hover:bg-red-500 hover:bg-opacity-20 transition-all duration-300 text-sm text-red-100">
+                        🗑️ Limpar
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="container mx-auto px-6 py-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
+            <p class="text-gray-600">Visão geral dos seus eventos e auditorias</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card-enhanced hover-lift p-6 slide-up">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Eventos Ativos</p>
+                        <p class="text-3xl font-bold text-gray-800">12</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                            <div class="progress-bar w-3/4"></div>
+                        </div>
+                    </div>
+                    <div class="w-16 h-16 gradient-blue rounded-2xl flex items-center justify-center shadow-medium">
+                        <span class="text-3xl">📅</span>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500">+2 este mês</p>
+            </div>
+            <div class="card-enhanced hover-lift p-6 slide-up" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Auditorias Pendentes</p>
+                        <p class="text-3xl font-bold text-orange-600">8</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                            <div class="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full w-2/3 transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <div class="w-16 h-16 gradient-warning rounded-2xl flex items-center justify-center shadow-medium pulse">
+                        <span class="text-3xl">⏰</span>
+                    </div>
+                </div>
+                <p class="text-xs text-orange-500">3 urgentes</p>
+            </div>
+            <div class="card-enhanced hover-lift p-6 slide-up" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Itens Críticos</p>
+                        <p class="text-3xl font-bold text-red-600">3</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                            <div class="bg-gradient-to-r from-red-400 to-red-600 h-2 rounded-full w-1/4 transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <div class="w-16 h-16 gradient-danger rounded-2xl flex items-center justify-center shadow-medium pulse">
+                        <span class="text-3xl">⚠️</span>
+                    </div>
+                </div>
+                <p class="text-xs text-red-500">Requer atenção</p>
+            </div>
+            <div class="card-enhanced hover-lift p-6 slide-up" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Score Médio</p>
+                        <p class="text-3xl font-bold text-green-600">85%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                            <div class="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full w-5/6 transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <div class="w-16 h-16 gradient-success rounded-2xl flex items-center justify-center shadow-medium">
+                        <span class="text-3xl">📊</span>
+                    </div>
+                </div>
+                <p class="text-xs text-green-500">Excelente!</p>
+            </div>
+        </div>
+
+        <!-- Action Required Alert -->
+        <div id="actionRequiredAlert" class="card-enhanced border-l-4 border-red-500 p-6 mb-8 hidden scale-in">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 gradient-danger rounded-2xl flex items-center justify-center shadow-medium pulse">
+                        <span class="text-3xl">⚠️</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-red-800 mb-1">Itens Requerem Ação</h3>
+                        <p class="text-red-600 font-medium" id="actionRequiredText">Alguns itens do checklist precisam de atenção imediata</p>
+                    </div>
+                </div>
+                <button onclick="viewProblemsDetail()" class="btn-primary px-6 py-3 rounded-xl text-sm font-semibold shadow-medium hover-lift">
+                    Ver Detalhes
+                </button>
+            </div>
+            <div id="problemsList" class="space-y-3">
+                <!-- Problems will be populated here -->
+            </div>
+        </div>
+
+        <!-- Rental Costs Summary -->
+        <div id="rentalCostsCard" class="card-enhanced shadow-strong p-8 mb-8 hidden scale-in" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-3xl font-bold mb-3 flex items-center text-white">
+                        <span class="mr-4 text-4xl">💰</span>
+                        Custos de Aluguel
+                    </h3>
+                    <p class="text-white text-opacity-90 font-medium text-lg" id="rentalDate">Último pedido realizado</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-5xl font-bold mb-2 text-white" id="rentalTotalDisplay">R$ 0,00</div>
+                    <div class="text-white text-opacity-90 font-medium text-lg" id="rentalItemsCount">0 itens alugados</div>
+                </div>
+            </div>
+            <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-2xl p-6 border border-white border-opacity-30">
+                <h4 class="font-bold mb-4 text-xl text-white">Itens Alugados:</h4>
+                <div id="rentalItemsList" class="space-y-3 max-h-40 overflow-y-auto">
+                    <!-- Rental items will be populated here -->
+                </div>
+                <button onclick="showRentalDetails()" class="mt-6 w-full bg-white bg-opacity-25 hover:bg-opacity-35 backdrop-blur-lg text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 hover-lift border border-white border-opacity-30">
+                    Ver Detalhes Completos
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Events -->
+        <div class="card-enhanced shadow-medium p-8 mb-8 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <span class="mr-3">📋</span>
+                    Eventos Recentes
+                </h3>
+                <button onclick="showSection('events')" class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center">
+                    Ver Todos
+                    <span class="ml-1">→</span>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="glass rounded-2xl p-6 hover-lift transition-all duration-300">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 gradient-purple rounded-2xl flex items-center justify-center shadow-medium">
+                                <span class="text-2xl">🎵</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg mb-1">Festival de Verão 2024</h4>
+                                <p class="text-gray-500 font-medium">15 de Janeiro • São Paulo</p>
+                                <div class="flex items-center mt-2 space-x-2">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span class="text-xs text-gray-600">10.000 pessoas</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="px-4 py-2 gradient-success text-white rounded-xl text-sm font-semibold shadow-soft">
+                                Baixo Risco
+                            </span>
+                            <button onclick="viewEvent('festival-verao')" class="btn-primary px-4 py-2 rounded-xl text-sm font-semibold hover-lift">
+                                Ver Detalhes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-2xl p-6 hover-lift transition-all duration-300">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 gradient-blue rounded-2xl flex items-center justify-center shadow-medium">
+                                <span class="text-2xl">🏢</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg mb-1">Congresso Tech 2024</h4>
+                                <p class="text-gray-500 font-medium">22 de Janeiro • Rio de Janeiro</p>
+                                <div class="flex items-center mt-2 space-x-2">
+                                    <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                    <span class="text-xs text-gray-600">500 pessoas</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="px-4 py-2 gradient-warning text-white rounded-xl text-sm font-semibold shadow-soft">
+                                Médio Risco
+                            </span>
+                            <button onclick="viewEvent('congresso-tech')" class="btn-primary px-4 py-2 rounded-xl text-sm font-semibold hover-lift">
+                                Ver Detalhes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="container mx-auto px-6 py-8 hidden">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Meus Eventos</h2>
+                <p class="text-gray-600">Gerencie todos os seus eventos e auditorias</p>
+            </div>
+            <button onclick="showCreateEvent()" class="btn-primary px-8 py-4 rounded-2xl font-bold text-lg shadow-medium hover-lift flex items-center space-x-2">
+                <span class="text-xl">+</span>
+                <span>Novo Evento</span>
+            </button>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="eventsGrid">
+            <!-- Event cards will be populated here -->
+        </div>
+    </section>
+
+    <!-- Create Event Modal -->
+    <div id="createEventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-gray-800">Criar Novo Evento</h3>
+                    <button onclick="closeCreateEvent()" class="text-gray-500 hover:text-gray-700">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+            </div>
+            <form id="createEventForm" class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Evento</label>
+                        <input type="text" id="eventName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: Festival de Música 2024">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Data do Evento</label>
+                        <input type="date" id="eventDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Local</label>
+                        <input type="text" id="eventLocation" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: Parque Ibirapuera, São Paulo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Público Estimado</label>
+                        <input type="number" id="eventAudience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: 5000">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Categoria do Evento</label>
+                    <select id="eventCategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Selecione uma categoria</option>
+                        <option value="show">Show/Concerto</option>
+                        <option value="festival">Festival</option>
+                        <option value="congresso">Congresso/Conferência</option>
+                        <option value="casamento">Casamento</option>
+                        <option value="corporativo">Evento Corporativo</option>
+                        <option value="cultural">Evento Cultural</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea id="eventDescription" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Descreva brevemente o evento..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" onclick="closeCreateEvent()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Criar Evento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div id="eventDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800" id="eventDetailTitle">Festival de Verão 2024</h3>
+                        <p class="text-gray-600" id="eventDetailInfo">15 de Janeiro • São Paulo • 10.000 pessoas</p>
+                    </div>
+                    <button onclick="closeEventDetail()" class="text-gray-500 hover:text-gray-700">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Event Detail Tabs -->
+            <div class="border-b">
+                <nav class="flex space-x-8 px-6">
+                    <button onclick="showEventTab('checklist')" class="py-4 px-2 border-b-2 border-blue-500 text-blue-600 font-medium event-tab active">
+                        Checklist
+                    </button>
+                    <button onclick="showEventTab('audit')" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 event-tab">
+                        Auditoria
+                    </button>
+                    <button onclick="showEventTab('team')" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 event-tab">
+                        Equipe
+                    </button>
+                    <button onclick="showEventTab('reports')" class="py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 event-tab">
+                        Relatórios
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Checklist Tab -->
+            <div id="checklistTab" class="p-6 event-tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-xl font-bold text-gray-800">Checklist do Evento</h4>
+                    <button onclick="addChecklistItem()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                        + Adicionar Item
+                    </button>
+                </div>
+
+                <!-- Marketplace Costs Summary -->
+                <div id="eventRentalCosts" class="rounded-xl shadow-strong p-6 mb-6 hidden" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h5 class="text-xl font-bold mb-2 text-white flex items-center">
+                                <span class="mr-3 text-2xl">💰</span>
+                                Custos de Aluguel - Marketplace
+                            </h5>
+                            <p class="text-white text-opacity-90 font-medium" id="eventRentalDate">Itens alugados para este evento</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-white" id="eventRentalTotal">R$ 0,00</div>
+                            <div class="text-white text-opacity-90 font-medium" id="eventRentalCount">0 itens</div>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-lg p-5 border border-white border-opacity-30">
+                        <h6 class="font-bold mb-4 text-white text-lg">Principais Itens:</h6>
+                        <div id="eventRentalItems" class="space-y-3 max-h-32 overflow-y-auto">
+                            <!-- Items will be populated here -->
+                        </div>
+                        <button onclick="showEventRentalDetails()" class="mt-4 bg-white bg-opacity-25 hover:bg-opacity-35 backdrop-blur-lg text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 hover-lift border border-white border-opacity-30">
+                            Ver Todos os Itens
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Checklist Categories -->
+                <div class="space-y-6">
+                    <!-- Equipamentos -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h5 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <span class="text-xl mr-2">🎛️</span>
+                            Equipamentos (8/10 itens)
+                        </h5>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between bg-white p-3 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" checked class="w-5 h-5 text-green-600">
+                                    <span class="text-gray-800">Sistema de Som Principal</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Crítico</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-green-600">✓</span>
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm">Editar</button>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between bg-white p-3 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" class="w-5 h-5 text-green-600">
+                                    <span class="text-gray-800">Microfones (12 unidades)</span>
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Importante</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-orange-600">⏳</span>
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm">Editar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estrutura -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h5 class="font-semibold text-gray-800 mb-3 flex items-center">
+                            <span class="text-xl mr-2">🏗️</span>
+                            Estrutura (5/7 itens)
+                        </h5>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between bg-white p-3 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" checked class="w-5 h-5 text-green-600">
+                                    <span class="text-gray-800">Palco Principal (12x8m)</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Crítico</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-green-600">✓</span>
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm">Editar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Tab -->
+            <div id="auditTab" class="p-6 event-tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-xl font-bold text-gray-800">Auditoria Pré-Evento</h4>
+                    <button onclick="scheduleAudit()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm">
+                        Agendar Auditoria
+                    </button>
+                </div>
+
+                <!-- Risk Score -->
+                <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h5 class="text-lg font-semibold mb-2">Score de Risco do Evento</h5>
+                            <p class="text-green-100">Baseado em 15 itens auditados</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold">85%</div>
+                            <div class="text-green-100">Baixo Risco</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit History -->
+                <div class="space-y-4">
+                    <h5 class="font-semibold text-gray-800">Histórico de Auditorias</h5>
+                    <div class="bg-white border rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <span class="text-sm font-medium">JM</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800">João Martins</p>
+                                    <p class="text-sm text-gray-500">Auditor Certificado • ⭐ 4.9</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">10 Jan 2024</p>
+                                <p class="text-sm font-medium text-green-600">Concluída</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p class="text-2xl font-bold text-green-600">23</p>
+                                <p class="text-sm text-gray-500">Itens OK</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-orange-600">3</p>
+                                <p class="text-sm text-gray-500">Atenção</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold text-red-600">1</p>
+                                <p class="text-sm text-gray-500">Crítico</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Tab -->
+            <div id="teamTab" class="p-6 event-tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-xl font-bold text-gray-800">Equipe do Evento</h4>
+                    <button onclick="addTeamMember()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                        + Adicionar Membro
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border rounded-lg p-4">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span class="font-medium">AM</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-800">Ana Maria Silva</p>
+                                <p class="text-sm text-gray-500">Produtora Executiva</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm"><span class="font-medium">Responsável por:</span> Coordenação Geral</p>
+                            <p class="text-sm"><span class="font-medium">Contato:</span> (11) 99999-9999</p>
+                            <div class="flex space-x-2 mt-3">
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Ativo</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">15 itens</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reportsTab" class="p-6 event-tab-content hidden">
+                <h4 class="text-xl font-bold text-gray-800 mb-6">Relatórios e Análises</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border rounded-lg p-6">
+                        <h5 class="font-semibold text-gray-800 mb-4">Relatório Final Pré-Evento</h5>
+                        <p class="text-gray-600 mb-4">Exportar relatório completo com todos os itens auditados, problemas encontrados e soluções aplicadas.</p>
+                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg">
+                            📄 Gerar Relatório PDF
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white border rounded-lg p-6">
+                        <h5 class="font-semibold text-gray-800 mb-4">Análise de Problemas Recorrentes</h5>
+                        <p class="text-gray-600 mb-4">Identificar itens que costumam falhar com base no histórico de eventos anteriores.</p>
+                        <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg">
+                            📊 Ver Análise
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auditors Section -->
+    <section id="auditors" class="container mx-auto px-6 py-8 hidden">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Auditores Disponíveis</h2>
+                <p class="text-gray-600">Encontre auditores certificados na sua região</p>
+            </div>
+            <button onclick="showAddAuditor()" class="gradient-success text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-medium hover-lift flex items-center space-x-2 transition-all duration-300">
+                <span class="text-xl">+</span>
+                <span>Adicionar Auditor</span>
+            </button>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="text" placeholder="Buscar por cidade..." class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option>Especialidade</option>
+                    <option>Shows e Festivais</option>
+                    <option>Eventos Corporativos</option>
+                    <option>Casamentos</option>
+                </select>
+                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option>Avaliação</option>
+                    <option>5 estrelas</option>
+                    <option>4+ estrelas</option>
+                    <option>3+ estrelas</option>
+                </select>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    Buscar
+                </button>
+            </div>
+        </div>
+
+        <!-- Auditors Grid -->
+        <div id="auditorsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Auditors will be populated here -->
+        </div>
+    </section>
+
+    <!-- Marketplace Section -->
+    <section id="marketplace" class="container mx-auto px-6 py-8 hidden">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Marketplace</h2>
+                <p class="text-gray-600">Equipamentos, serviços e fornecedores para seu evento</p>
+            </div>
+            <button onclick="toggleCart()" class="relative btn-primary px-8 py-4 rounded-2xl font-bold text-lg shadow-medium hover-lift flex items-center space-x-2">
+                <span class="text-xl">🛒</span>
+                <span>Carrinho</span>
+                <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 text-sm flex items-center justify-center hidden pulse">0</span>
+            </button>
+        </div>
+
+        <!-- Categories -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <button onclick="showCategory('som')" class="category-btn card-enhanced hover-lift p-6 text-center transition-all duration-300 group">
+                <div class="w-16 h-16 gradient-blue rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-medium group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🎵</span>
+                </div>
+                <p class="font-bold text-gray-800">Som</p>
+                <p class="text-xs text-gray-500 mt-1">Equipamentos de áudio</p>
+            </button>
+            <button onclick="showCategory('iluminacao')" class="category-btn card-enhanced hover-lift p-6 text-center transition-all duration-300 group">
+                <div class="w-16 h-16 gradient-warning rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-medium group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">💡</span>
+                </div>
+                <p class="font-bold text-gray-800">Iluminação</p>
+                <p class="text-xs text-gray-500 mt-1">Luzes e efeitos</p>
+            </button>
+            <button onclick="showCategory('estrutura')" class="category-btn card-enhanced hover-lift p-6 text-center transition-all duration-300 group">
+                <div class="w-16 h-16 gradient-purple rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-medium group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🎪</span>
+                </div>
+                <p class="font-bold text-gray-800">Estrutura</p>
+                <p class="text-xs text-gray-500 mt-1">Palcos e tendas</p>
+            </button>
+            <button onclick="showCategory('transporte')" class="category-btn card-enhanced hover-lift p-6 text-center transition-all duration-300 group">
+                <div class="w-16 h-16 gradient-teal rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-medium group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🚐</span>
+                </div>
+                <p class="font-bold text-gray-800">Transporte</p>
+                <p class="text-xs text-gray-500 mt-1">Veículos e logística</p>
+            </button>
+            <button onclick="showCategory('catering')" class="category-btn card-enhanced hover-lift p-6 text-center transition-all duration-300 group">
+                <div class="w-16 h-16 gradient-success rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-medium group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🍽️</span>
+                </div>
+                <p class="font-bold text-gray-800">Catering</p>
+                <p class="text-xs text-gray-500 mt-1">Alimentação</p>
+            </button>
+            <button onclick="showCategory('seguranca')" class="category-btn card-enhanced hover-lift p-6 text-center transition-all duration-300 group">
+                <div class="w-16 h-16 gradient-danger rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-medium group-hover:scale-110 transition-transform">
+                    <span class="text-2xl">🛡️</span>
+                </div>
+                <p class="font-bold text-gray-800">Segurança</p>
+                <p class="text-xs text-gray-500 mt-1">Proteção e controle</p>
+            </button>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="card-enhanced shadow-medium p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <span class="text-2xl mr-3">🔍</span>
+                <h3 class="text-xl font-bold text-gray-800">Filtros de Busca</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="Buscar produtos..." class="input-enhanced w-full px-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 font-medium">
+                    <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+                </div>
+                <select id="priceFilter" class="input-enhanced px-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 font-medium">
+                    <option value="">💰 Faixa de Preço</option>
+                    <option value="0-500">Até R$ 500/dia</option>
+                    <option value="500-1000">R$ 500 - R$ 1.000/dia</option>
+                    <option value="1000-2000">R$ 1.000 - R$ 2.000/dia</option>
+                    <option value="2000+">Acima de R$ 2.000/dia</option>
+                </select>
+                <select id="locationFilter" class="input-enhanced px-6 py-4 rounded-2xl focus:ring-2 focus:ring-blue-500 font-medium">
+                    <option value="">📍 Localização</option>
+                    <option value="sao-paulo">São Paulo</option>
+                    <option value="rio-janeiro">Rio de Janeiro</option>
+                    <option value="belo-horizonte">Belo Horizonte</option>
+                    <option value="brasilia">Brasília</option>
+                </select>
+                <button onclick="filterProducts()" class="btn-primary px-8 py-4 rounded-2xl font-bold shadow-medium hover-lift">
+                    Filtrar
+                </button>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Products will be populated here -->
+        </div>
+
+        <!-- Show All Products Button -->
+        <div class="text-center mt-8">
+            <button onclick="showAllProducts()" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-medium">
+                Ver Todos os Produtos
+            </button>
+        </div>
+    </section>
+
+    <!-- Floating Help Button -->
+    <button class="fab" onclick="showHelp()" title="Ajuda e Suporte">
+        <span class="text-2xl">💬</span>
+    </button>
+
+    <!-- Add Auditor Modal -->
+    <div id="addAuditorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-gray-800">Adicionar Novo Auditor</h3>
+                    <button onclick="closeAddAuditor()" class="text-gray-500 hover:text-gray-700">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+            </div>
+            <form id="addAuditorForm" class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                        <input type="text" id="auditorName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: João Silva" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Título Profissional</label>
+                        <input type="text" id="auditorTitle" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: Auditor Certificado" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Localização</label>
+                        <input type="text" id="auditorLocation" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: São Paulo, SP" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Especialidade</label>
+                        <select id="auditorSpecialty" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <option value="">Selecione uma especialidade</option>
+                            <option value="Shows e Festivais">Shows e Festivais</option>
+                            <option value="Eventos Corporativos">Eventos Corporativos</option>
+                            <option value="Casamentos">Casamentos</option>
+                            <option value="Eventos Esportivos">Eventos Esportivos</option>
+                            <option value="Congressos e Conferências">Congressos e Conferências</option>
+                            <option value="Eventos Culturais">Eventos Culturais</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Experiência (anos)</label>
+                        <input type="number" id="auditorExperience" min="1" max="50" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: 5" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Preço por Hora (R$)</label>
+                        <input type="number" id="auditorPrice" min="50" max="1000" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ex: 150" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Avaliação (1-5)</label>
+                        <select id="auditorRating" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                            <option value="">Selecione</option>
+                            <option value="5.0">⭐⭐⭐⭐⭐ (5.0)</option>
+                            <option value="4.9">⭐⭐⭐⭐⭐ (4.9)</option>
+                            <option value="4.8">⭐⭐⭐⭐⭐ (4.8)</option>
+                            <option value="4.7">⭐⭐⭐⭐⭐ (4.7)</option>
+                            <option value="4.6">⭐⭐⭐⭐⭐ (4.6)</option>
+                            <option value="4.5">⭐⭐⭐⭐⭐ (4.5)</option>
+                            <option value="4.0">⭐⭐⭐⭐ (4.0)</option>
+                            <option value="3.5">⭐⭐⭐ (3.5)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                        <input type="tel" id="auditorPhone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="(11) 99999-9999" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                        <input type="email" id="auditorEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="exemplo@email.com" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Certificações e Qualificações</label>
+                    <textarea id="auditorCertifications" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Liste as principais certificações e qualificações do auditor..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" onclick="closeAddAuditor()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        Adicionar Auditor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-gray-800">Carrinho de Compras</h3>
+                    <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="cartItems" class="space-y-4 mb-6">
+                    <!-- Cart items will be populated here -->
+                </div>
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xl font-bold text-gray-800">Total:</span>
+                        <span id="cartTotal" class="text-2xl font-bold text-blue-600">R$ 0,00</span>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button onclick="clearCart()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg">
+                            Limpar Carrinho
+                        </button>
+                        <button onclick="checkout()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg">
+                            Finalizar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentSection = 'dashboard';
+        let events = [];
+        let isDarkTheme = false;
+        let auditors = [];
+
+        // Storage functions
+        function saveEvents() {
+            localStorage.setItem('showready_events', JSON.stringify(events));
+        }
+
+        function loadEvents() {
+            const saved = localStorage.getItem('showready_events');
+            if (saved) {
+                events = JSON.parse(saved);
+            } else {
+                // Default events for first time users
+                events = [
+                    {
+                        id: 'festival-verao',
+                        name: 'Festival de Verão 2024',
+                        date: '2024-01-15',
+                        location: 'São Paulo',
+                        audience: 10000,
+                        category: 'festival',
+                        risk: 'low'
+                    },
+                    {
+                        id: 'congresso-tech',
+                        name: 'Congresso Tech 2024',
+                        date: '2024-01-22',
+                        location: 'Rio de Janeiro',
+                        audience: 500,
+                        category: 'congresso',
+                        risk: 'medium'
+                    }
+                ];
+                saveEvents();
+            }
+        }
+
+        // Auditors Management
+        function saveAuditors() {
+            localStorage.setItem('showready_auditors', JSON.stringify(auditors));
+        }
+
+        function loadAuditors() {
+            const saved = localStorage.getItem('showready_auditors');
+            if (saved) {
+                auditors = JSON.parse(saved);
+            } else {
+                // Default auditors for first time users
+                auditors = [
+                    {
+                        id: 1,
+                        name: 'João Martins',
+                        title: 'Auditor Certificado',
+                        location: 'São Paulo, SP',
+                        specialty: 'Shows e Festivais',
+                        experience: 8,
+                        price: 150,
+                        rating: 4.9,
+                        phone: '(11) 99999-9999',
+                        email: 'joao.martins@email.com',
+                        certifications: 'Certificado ISO 9001, Especialização em Eventos de Grande Porte'
+                    },
+                    {
+                        id: 2,
+                        name: 'Maria Clara',
+                        title: 'Auditora Sênior',
+                        location: 'Rio de Janeiro, RJ',
+                        specialty: 'Eventos Corporativos',
+                        experience: 12,
+                        price: 200,
+                        rating: 4.8,
+                        phone: '(21) 88888-8888',
+                        email: 'maria.clara@email.com',
+                        certifications: 'MBA em Gestão de Eventos, Certificação PMP'
+                    }
+                ];
+                saveAuditors();
+            }
+        }
+
+        function showAddAuditor() {
+            document.getElementById('addAuditorModal').classList.remove('hidden');
+        }
+
+        function closeAddAuditor() {
+            document.getElementById('addAuditorModal').classList.add('hidden');
+            document.getElementById('addAuditorForm').reset();
+        }
+
+        function updateAuditorsGrid() {
+            const grid = document.getElementById('auditorsGrid');
+            grid.innerHTML = '';
+
+            if (auditors.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        <span class="text-4xl mb-4 block">👥</span>
+                        <p class="text-lg mb-2">Nenhum auditor cadastrado</p>
+                        <p class="text-sm">Clique em "Adicionar Auditor" para começar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            auditors.forEach(auditor => {
+                const initials = auditor.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                const stars = '⭐'.repeat(Math.floor(auditor.rating));
+                
+                const auditorCard = document.createElement('div');
+                auditorCard.className = 'bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow';
+                auditorCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-xl font-bold">${initials}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">${auditor.name}</h3>
+                                <p class="text-gray-600">${auditor.title}</p>
+                                <div class="flex items-center space-x-1">
+                                    <span class="text-yellow-400">${stars}</span>
+                                    <span class="text-sm text-gray-500">(${auditor.rating})</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="removeAuditor(${auditor.id})" class="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Excluir auditor">
+                            🗑️
+                        </button>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <p class="text-sm"><span class="font-medium">Localização:</span> ${auditor.location}</p>
+                        <p class="text-sm"><span class="font-medium">Especialidade:</span> ${auditor.specialty}</p>
+                        <p class="text-sm"><span class="font-medium">Experiência:</span> ${auditor.experience} anos</p>
+                        <p class="text-sm"><span class="font-medium">Preço:</span> R$ ${auditor.price}/hora</p>
+                        <p class="text-sm"><span class="font-medium">Contato:</span> ${auditor.phone}</p>
+                    </div>
+                    ${auditor.certifications ? `
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                            <p class="text-sm text-blue-800"><strong>Certificações:</strong> ${auditor.certifications}</p>
+                        </div>
+                    ` : ''}
+                    <div class="flex space-x-2">
+                        <button onclick="hireAuditor(${auditor.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm transition-colors">
+                            Contratar
+                        </button>
+                        <button onclick="editAuditor(${auditor.id})" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm transition-colors">
+                            Editar
+                        </button>
+                        <button onclick="viewAuditorProfile(${auditor.id})" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm transition-colors">
+                            Perfil
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(auditorCard);
+            });
+        }
+
+        function removeAuditor(auditorId) {
+            const auditor = auditors.find(a => a.id === auditorId);
+            if (auditor && confirm(`Tem certeza que deseja excluir ${auditor.name} da lista de auditores?`)) {
+                auditors = auditors.filter(a => a.id !== auditorId);
+                saveAuditors();
+                updateAuditorsGrid();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = `${auditor.name} foi removido da lista`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successMsg)) {
+                        document.body.removeChild(successMsg);
+                    }
+                }, 3000);
+            }
+        }
+
+        function hireAuditor(auditorId) {
+            const auditor = auditors.find(a => a.id === auditorId);
+            if (auditor) {
+                alert(`Contratando ${auditor.name}!\n\nEm breve você receberá um e-mail com os detalhes do contrato e instruções para pagamento.\n\nContato: ${auditor.phone}\nE-mail: ${auditor.email}`);
+            }
+        }
+
+        function editAuditor(auditorId) {
+            const auditor = auditors.find(a => a.id === auditorId);
+            if (!auditor) return;
+            
+            // Fill form with current data
+            document.getElementById('auditorName').value = auditor.name;
+            document.getElementById('auditorTitle').value = auditor.title;
+            document.getElementById('auditorLocation').value = auditor.location;
+            document.getElementById('auditorSpecialty').value = auditor.specialty;
+            document.getElementById('auditorExperience').value = auditor.experience;
+            document.getElementById('auditorPrice').value = auditor.price;
+            document.getElementById('auditorRating').value = auditor.rating;
+            document.getElementById('auditorPhone').value = auditor.phone;
+            document.getElementById('auditorEmail').value = auditor.email;
+            document.getElementById('auditorCertifications').value = auditor.certifications || '';
+            
+            // Change form title and button
+            document.querySelector('#addAuditorModal h3').textContent = 'Editar Auditor';
+            document.querySelector('#addAuditorForm button[type="submit"]').textContent = 'Salvar Alterações';
+            
+            // Store the ID for editing
+            document.getElementById('addAuditorForm').dataset.editingId = auditorId;
+            
+            showAddAuditor();
+        }
+
+        function viewAuditorProfile(auditorId) {
+            const auditor = auditors.find(a => a.id === auditorId);
+            if (!auditor) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <span class="text-2xl font-bold">${auditor.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-800">${auditor.name}</h3>
+                                    <p class="text-gray-600">${auditor.title}</p>
+                                    <div class="flex items-center space-x-1 mt-1">
+                                        <span class="text-yellow-400">${'⭐'.repeat(Math.floor(auditor.rating))}</span>
+                                        <span class="text-sm text-gray-500">(${auditor.rating})</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="closeAuditorProfile()" class="text-gray-500 hover:text-gray-700">
+                                <span class="text-2xl">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-gray-800 mb-3">Informações Profissionais</h4>
+                                <div class="space-y-2">
+                                    <p class="text-sm"><span class="font-medium">Especialidade:</span> ${auditor.specialty}</p>
+                                    <p class="text-sm"><span class="font-medium">Experiência:</span> ${auditor.experience} anos</p>
+                                    <p class="text-sm"><span class="font-medium">Localização:</span> ${auditor.location}</p>
+                                    <p class="text-sm"><span class="font-medium">Preço:</span> R$ ${auditor.price}/hora</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="font-semibold text-gray-800 mb-3">Contato</h4>
+                                <div class="space-y-2">
+                                    <p class="text-sm"><span class="font-medium">Telefone:</span> ${auditor.phone}</p>
+                                    <p class="text-sm"><span class="font-medium">E-mail:</span> ${auditor.email}</p>
+                                </div>
+                            </div>
+                        </div>
+                        ${auditor.certifications ? `
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="font-semibold text-blue-800 mb-3">Certificações e Qualificações</h4>
+                                <p class="text-sm text-blue-700">${auditor.certifications}</p>
+                            </div>
+                        ` : ''}
+                        <div class="flex justify-end space-x-4">
+                            <button onclick="closeAuditorProfile()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                Fechar
+                            </button>
+                            <button onclick="hireAuditor(${auditor.id}); closeAuditorProfile();" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Contratar Auditor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function closeAuditorProfile() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(section).classList.remove('hidden');
+            currentSection = section;
+
+            // Update events grid if showing events section
+            if (section === 'events') {
+                updateEventsGrid();
+            }
+            
+            // Update auditors grid if showing auditors section
+            if (section === 'auditors') {
+                updateAuditorsGrid();
+            }
+        }
+
+        // Event Management
+        function showCreateEvent() {
+            document.getElementById('createEventModal').classList.remove('hidden');
+        }
+
+        function closeCreateEvent() {
+            document.getElementById('createEventModal').classList.add('hidden');
+            document.getElementById('createEventForm').reset();
+        }
+
+        function updateEventsGrid() {
+            const grid = document.getElementById('eventsGrid');
+            grid.innerHTML = '';
+
+            events.forEach(event => {
+                const riskColor = event.risk === 'low' ? 'green' : event.risk === 'medium' ? 'orange' : 'red';
+                const riskText = event.risk === 'low' ? 'Baixo Risco' : event.risk === 'medium' ? 'Médio Risco' : 'Alto Risco';
+                
+                const eventCard = document.createElement('div');
+                eventCard.className = 'bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow';
+                eventCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <span class="text-xl">${event.category === 'festival' ? '🎵' : '🏢'}</span>
+                        </div>
+                        <span class="px-3 py-1 bg-${riskColor}-100 text-${riskColor}-800 rounded-full text-sm font-medium">${riskText}</span>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">${event.name}</h3>
+                    <p class="text-gray-600 text-sm mb-4">${new Date(event.date).toLocaleDateString('pt-BR')} • ${event.location}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">${event.audience.toLocaleString()} pessoas</span>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm view-event-btn" data-event-id="${event.id}">
+                            Ver Detalhes
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(eventCard);
+            });
+
+            // Add event listeners to all "Ver Detalhes" buttons
+            document.querySelectorAll('.view-event-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const eventId = this.getAttribute('data-event-id');
+                    viewEvent(eventId);
+                });
+            });
+        }
+
+        function viewEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (event) {
+                document.getElementById('eventDetailTitle').textContent = event.name;
+                document.getElementById('eventDetailInfo').textContent = 
+                    `${new Date(event.date).toLocaleDateString('pt-BR')} • ${event.location} • ${event.audience.toLocaleString()} pessoas`;
+                
+                // Update rental costs for this event
+                updateEventRentalCosts();
+                
+                document.getElementById('eventDetailModal').classList.remove('hidden');
+            }
+        }
+
+        function updateEventRentalCosts() {
+            const eventRentalCosts = document.getElementById('eventRentalCosts');
+            const eventRentalTotal = document.getElementById('eventRentalTotal');
+            const eventRentalCount = document.getElementById('eventRentalCount');
+            const eventRentalDate = document.getElementById('eventRentalDate');
+            const eventRentalItems = document.getElementById('eventRentalItems');
+
+            if (rentalCosts.total > 0) {
+                eventRentalCosts.classList.remove('hidden');
+                
+                eventRentalTotal.textContent = `R$ ${rentalCosts.total.toLocaleString()},00`;
+                eventRentalCount.textContent = `${rentalCosts.items.length} itens alugados`;
+                
+                if (rentalCosts.date) {
+                    const date = new Date(rentalCosts.date);
+                    eventRentalDate.textContent = `Pedido realizado em ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+
+                // Display top 3 items
+                eventRentalItems.innerHTML = rentalCosts.items.slice(0, 3).map(item => `
+                    <div class="flex justify-between items-center text-base bg-white bg-opacity-10 rounded-lg p-3 backdrop-blur-sm">
+                        <span class="text-white font-medium">${item.quantity}x ${item.name}</span>
+                        <span class="font-bold text-white text-lg">R$ ${item.subtotal.toLocaleString()}</span>
+                    </div>
+                `).join('');
+
+                if (rentalCosts.items.length > 3) {
+                    eventRentalItems.innerHTML += `
+                        <div class="text-center text-white text-opacity-80 text-sm mt-3 font-medium">
+                            E mais ${rentalCosts.items.length - 3} item(s)...
+                        </div>
+                    `;
+                }
+            } else {
+                eventRentalCosts.classList.add('hidden');
+            }
+        }
+
+        function showEventRentalDetails() {
+            showRentalDetails();
+        }
+
+        function closeEventDetail() {
+            document.getElementById('eventDetailModal').classList.add('hidden');
+        }
+
+        // Event Detail Tabs
+        function showEventTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.event-tab-content').forEach(tab => tab.classList.add('hidden'));
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+
+            // Update tab buttons
+            document.querySelectorAll('.event-tab').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Find and activate the clicked button
+            const clickedButton = document.querySelector(`[onclick="showEventTab('${tabName}')"]`);
+            if (clickedButton) {
+                clickedButton.classList.remove('border-transparent', 'text-gray-500');
+                clickedButton.classList.add('border-blue-500', 'text-blue-600');
+            }
+        }
+
+        // Form Handlers
+        document.getElementById('createEventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newEvent = {
+                id: 'event-' + Date.now(),
+                name: document.getElementById('eventName').value,
+                date: document.getElementById('eventDate').value,
+                location: document.getElementById('eventLocation').value,
+                audience: parseInt(document.getElementById('eventAudience').value),
+                category: document.getElementById('eventCategory').value,
+                risk: 'medium' // Default risk level
+            };
+
+            events.push(newEvent);
+            saveEvents(); // Save to localStorage
+            closeCreateEvent();
+            
+            // Show success message
+            alert('Evento criado e salvo com sucesso! Checklist inteligente foi gerado automaticamente.');
+            
+            // Update events grid if on events section
+            if (currentSection === 'events') {
+                updateEventsGrid();
+            }
+        });
+
+        // Checklist Management
+        let checklistItems = [
+            {
+                id: 1,
+                name: 'Sistema de Som Principal',
+                category: 'Equipamentos',
+                priority: 'Crítico',
+                completed: true,
+                description: 'Verificar funcionamento completo do sistema de som'
+            },
+            {
+                id: 2,
+                name: 'Microfones (12 unidades)',
+                category: 'Equipamentos',
+                priority: 'Importante',
+                completed: false,
+                description: 'Testar todos os microfones e verificar baterias'
+            },
+            {
+                id: 3,
+                name: 'Palco Principal (12x8m)',
+                category: 'Estrutura',
+                priority: 'Crítico',
+                completed: true,
+                description: 'Verificar estabilidade e segurança da estrutura'
+            }
+        ];
+
+        let rentalCosts = {
+            total: 0,
+            items: [],
+            date: null
+        };
+
+        // Automatic checklist templates based on categories
+        const checklistTemplates = {
+            'som': [
+                { name: 'Teste de Funcionamento Geral', priority: 'Crítico', description: 'Verificar se todos os equipamentos de som estão funcionando corretamente' },
+                { name: 'Verificação de Cabos e Conexões', priority: 'Crítico', description: 'Inspecionar todos os cabos de áudio e conexões' },
+                { name: 'Teste de Níveis de Áudio', priority: 'Importante', description: 'Ajustar e testar níveis de entrada e saída' },
+                { name: 'Backup de Equipamentos', priority: 'Importante', description: 'Verificar disponibilidade de equipamentos reserva' },
+                { name: 'Posicionamento e Acústica', priority: 'Normal', description: 'Verificar posicionamento ideal dos equipamentos' }
+            ],
+            'iluminacao': [
+                { name: 'Teste de Funcionamento das Luzes', priority: 'Crítico', description: 'Verificar se todas as luzes estão funcionando' },
+                { name: 'Programação da Mesa de Luz', priority: 'Crítico', description: 'Configurar e testar programação de iluminação' },
+                { name: 'Verificação de Cabos DMX', priority: 'Importante', description: 'Inspecionar cabos de controle DMX' },
+                { name: 'Posicionamento dos Refletores', priority: 'Importante', description: 'Verificar ângulos e posições das luzes' },
+                { name: 'Teste de Efeitos Especiais', priority: 'Normal', description: 'Testar lasers, strobo e máquinas de fumaça' }
+            ],
+            'estrutura': [
+                { name: 'Inspeção de Segurança Estrutural', priority: 'Crítico', description: 'Verificar estabilidade e segurança de toda estrutura' },
+                { name: 'Verificação de Ancoragem', priority: 'Crítico', description: 'Inspecionar fixações e ancoragens' },
+                { name: 'Teste de Capacidade de Carga', priority: 'Crítico', description: 'Verificar limites de peso suportado' },
+                { name: 'Inspeção de Materiais', priority: 'Importante', description: 'Verificar integridade de treliças, palcos e tendas' },
+                { name: 'Sinalização de Segurança', priority: 'Importante', description: 'Instalar placas e sinalizações necessárias' }
+            ],
+            'transporte': [
+                { name: 'Inspeção Veicular', priority: 'Crítico', description: 'Verificar condições mecânicas dos veículos' },
+                { name: 'Documentação dos Veículos', priority: 'Crítico', description: 'Conferir licenciamento, seguro e documentos' },
+                { name: 'Verificação de Combustível', priority: 'Importante', description: 'Garantir abastecimento adequado' },
+                { name: 'Teste de Equipamentos de Carga', priority: 'Importante', description: 'Verificar rampas, guindastes e equipamentos' },
+                { name: 'Planejamento de Rotas', priority: 'Normal', description: 'Definir rotas e horários de transporte' }
+            ],
+            'catering': [
+                { name: 'Inspeção Sanitária', priority: 'Crítico', description: 'Verificar condições de higiene e limpeza' },
+                { name: 'Verificação de Equipamentos', priority: 'Crítico', description: 'Testar fornos, geladeiras e equipamentos de cozinha' },
+                { name: 'Controle de Temperatura', priority: 'Importante', description: 'Verificar refrigeração e aquecimento' },
+                { name: 'Estoque de Ingredientes', priority: 'Importante', description: 'Conferir qualidade e quantidade dos alimentos' },
+                { name: 'Licenças e Autorizações', priority: 'Normal', description: 'Verificar alvarás sanitários e licenças' }
+            ],
+            'seguranca': [
+                { name: 'Teste de Equipamentos de Segurança', priority: 'Crítico', description: 'Verificar câmeras, detectores e alarmes' },
+                { name: 'Briefing da Equipe', priority: 'Crítico', description: 'Orientar equipe sobre procedimentos de segurança' },
+                { name: 'Verificação de Comunicação', priority: 'Importante', description: 'Testar rádios e sistemas de comunicação' },
+                { name: 'Inspeção de Acessos', priority: 'Importante', description: 'Verificar controles de entrada e saída' },
+                { name: 'Plano de Emergência', priority: 'Normal', description: 'Revisar procedimentos de evacuação e emergência' }
+            ]
+        };
+
+        function generateAutomaticChecklists() {
+            // Group cart items by category
+            const categoriesInCart = {};
+            cart.forEach(item => {
+                if (!categoriesInCart[item.category]) {
+                    categoriesInCart[item.category] = [];
+                }
+                categoriesInCart[item.category].push(item);
+            });
+
+            // Generate checklist items for each category
+            Object.keys(categoriesInCart).forEach(category => {
+                const items = categoriesInCart[category];
+                const templates = checklistTemplates[category] || [];
+                
+                templates.forEach(template => {
+                    // Check if similar item already exists
+                    const existingItem = checklistItems.find(item => 
+                        item.name.toLowerCase().includes(template.name.toLowerCase()) ||
+                        template.name.toLowerCase().includes(item.name.toLowerCase())
+                    );
+                    
+                    if (!existingItem) {
+                        const newItem = {
+                            id: Date.now() + Math.random(),
+                            name: template.name,
+                            category: getCategoryDisplayName(category),
+                            priority: template.priority,
+                            completed: false,
+                            description: template.description,
+                            source: 'marketplace',
+                            relatedItems: items.map(item => item.name).join(', ')
+                        };
+                        
+                        checklistItems.push(newItem);
+                    }
+                });
+
+                // Add specific items from cart
+                items.forEach(item => {
+                    const specificChecklist = {
+                        id: Date.now() + Math.random(),
+                        name: `Verificação: ${item.name}`,
+                        category: getCategoryDisplayName(category),
+                        priority: 'Importante',
+                        completed: false,
+                        description: `Verificar funcionamento e condições do item alugado: ${item.name}`,
+                        source: 'marketplace',
+                        relatedItems: item.name,
+                        quantity: item.quantity
+                    };
+                    
+                    checklistItems.push(specificChecklist);
+                });
+            });
+        }
+
+        function getCategoryDisplayName(category) {
+            const names = {
+                'som': 'Equipamentos de Som',
+                'iluminacao': 'Iluminação',
+                'estrutura': 'Estrutura',
+                'transporte': 'Transporte e Logística',
+                'catering': 'Catering e Alimentação',
+                'seguranca': 'Segurança'
+            };
+            return names[category] || 'Outros';
+        }
+
+        function storeRentalCosts(total, cartItems) {
+            rentalCosts = {
+                total: total,
+                items: cartItems.map(item => ({
+                    name: item.name,
+                    category: item.category,
+                    price: item.price,
+                    quantity: item.quantity,
+                    subtotal: item.price * item.quantity
+                })),
+                date: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('showready_rental_costs', JSON.stringify(rentalCosts));
+        }
+
+        function loadRentalCosts() {
+            const saved = localStorage.getItem('showready_rental_costs');
+            if (saved) {
+                rentalCosts = JSON.parse(saved);
+            }
+        }
+
+        function updateRentalCostsDisplay() {
+            const rentalCard = document.getElementById('rentalCostsCard');
+            const totalDisplay = document.getElementById('rentalTotalDisplay');
+            const itemsCount = document.getElementById('rentalItemsCount');
+            const rentalDate = document.getElementById('rentalDate');
+            const itemsList = document.getElementById('rentalItemsList');
+
+            if (rentalCosts.total > 0) {
+                rentalCard.classList.remove('hidden');
+                
+                totalDisplay.textContent = `R$ ${rentalCosts.total.toLocaleString()},00`;
+                itemsCount.textContent = `${rentalCosts.items.length} itens alugados`;
+                
+                if (rentalCosts.date) {
+                    const date = new Date(rentalCosts.date);
+                    rentalDate.textContent = `Pedido realizado em ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+
+                // Display top 3 items
+                itemsList.innerHTML = rentalCosts.items.slice(0, 3).map(item => `
+                    <div class="flex justify-between items-center text-base bg-white bg-opacity-10 rounded-lg p-3 backdrop-blur-sm">
+                        <span class="text-white font-medium">${item.quantity}x ${item.name}</span>
+                        <span class="font-bold text-white text-lg">R$ ${item.subtotal.toLocaleString()}</span>
+                    </div>
+                `).join('');
+
+                if (rentalCosts.items.length > 3) {
+                    itemsList.innerHTML += `
+                        <div class="text-center text-white text-opacity-80 text-sm mt-3 font-medium">
+                            E mais ${rentalCosts.items.length - 3} item(s)...
+                        </div>
+                    `;
+                }
+            } else {
+                rentalCard.classList.add('hidden');
+            }
+        }
+
+        function showRentalDetails() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-2xl font-bold text-gray-800">💰 Detalhes dos Custos de Aluguel</h3>
+                            <button onclick="closeRentalDetails()" class="text-gray-500 hover:text-gray-700">
+                                <span class="text-2xl">×</span>
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mt-2">${rentalCosts.date ? `Pedido realizado em ${new Date(rentalCosts.date).toLocaleString('pt-BR')}` : ''}</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4 mb-6">
+                            ${rentalCosts.items.map(item => `
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">${getItemIcon(item.category)}</span>
+                                        <div>
+                                            <h5 class="font-medium text-gray-800">${item.name}</h5>
+                                            <p class="text-sm text-gray-500">${getCategoryName(item.category)} • R$ ${item.price.toLocaleString()}/dia</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium text-gray-800">${item.quantity}x</p>
+                                        <p class="text-lg font-bold text-purple-600">R$ ${item.subtotal.toLocaleString()}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xl font-bold text-gray-800">Total Geral:</span>
+                                <span class="text-3xl font-bold text-purple-600">R$ ${rentalCosts.total.toLocaleString()},00</span>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p class="text-blue-800 text-sm">
+                                    <strong>💡 Dica:</strong> Checklists automáticos foram gerados baseados nos itens alugados. 
+                                    Verifique a aba "Checklist" nos detalhes do evento para conferir todos os itens de verificação.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function closeRentalDetails() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        function getItemIcon(category) {
+            const icons = {
+                'som': '🎵',
+                'iluminacao': '💡',
+                'estrutura': '🎪',
+                'transporte': '🚐',
+                'catering': '🍽️',
+                'seguranca': '🛡️'
+            };
+            return icons[category] || '📦';
+        }
+
+        function addChecklistItem() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+                    <div class="p-6 border-b">
+                        <h3 class="text-xl font-bold text-gray-800">Adicionar Item ao Checklist</h3>
+                    </div>
+                    <form id="addItemForm" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Item</label>
+                            <input type="text" id="itemName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ex: Câmeras de Segurança" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                            <select id="itemCategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Equipamentos">Equipamentos</option>
+                                <option value="Estrutura">Estrutura</option>
+                                <option value="Segurança">Segurança</option>
+                                <option value="Logística">Logística</option>
+                                <option value="Documentação">Documentação</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                            <select id="itemPriority" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Selecione a prioridade</option>
+                                <option value="Crítico">Crítico</option>
+                                <option value="Importante">Importante</option>
+                                <option value="Normal">Normal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                            <textarea id="itemDescription" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Descreva o que precisa ser verificado..."></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" class="cancel-add-item px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Adicionar Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle cancel button
+            modal.querySelector('.cancel-add-item').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Handle form submission
+            document.getElementById('addItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const newItem = {
+                    id: Date.now(),
+                    name: document.getElementById('itemName').value,
+                    category: document.getElementById('itemCategory').value,
+                    priority: document.getElementById('itemPriority').value,
+                    completed: false,
+                    description: document.getElementById('itemDescription').value
+                };
+                
+                checklistItems.push(newItem);
+                updateChecklistDisplay();
+                
+                // Clear form fields
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemCategory').value = '';
+                document.getElementById('itemPriority').value = '';
+                document.getElementById('itemDescription').value = '';
+                
+                // Close modal
+                document.body.removeChild(modal);
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = 'Item adicionado com sucesso!';
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 3000);
+            });
+        }
+
+        function closeAddItemModal() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        function editChecklistItem(itemId) {
+            const item = checklistItems.find(i => i.id === itemId);
+            if (!item) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+                    <div class="p-6 border-b">
+                        <h3 class="text-xl font-bold text-gray-800">Editar Item do Checklist</h3>
+                    </div>
+                    <form id="editItemForm" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Item</label>
+                            <input type="text" id="editItemName" value="${item.name}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                            <select id="editItemCategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Equipamentos" ${item.category === 'Equipamentos' ? 'selected' : ''}>Equipamentos</option>
+                                <option value="Estrutura" ${item.category === 'Estrutura' ? 'selected' : ''}>Estrutura</option>
+                                <option value="Segurança" ${item.category === 'Segurança' ? 'selected' : ''}>Segurança</option>
+                                <option value="Logística" ${item.category === 'Logística' ? 'selected' : ''}>Logística</option>
+                                <option value="Documentação" ${item.category === 'Documentação' ? 'selected' : ''}>Documentação</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
+                            <select id="editItemPriority" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Crítico" ${item.priority === 'Crítico' ? 'selected' : ''}>Crítico</option>
+                                <option value="Importante" ${item.priority === 'Importante' ? 'selected' : ''}>Importante</option>
+                                <option value="Normal" ${item.priority === 'Normal' ? 'selected' : ''}>Normal</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                            <textarea id="editItemDescription" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">${item.description}</textarea>
+                        </div>
+                        <div class="flex justify-between pt-4">
+                            <button type="button" class="delete-item-btn px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                🗑️ Excluir
+                            </button>
+                            <div class="space-x-4">
+                                <button type="button" class="cancel-edit-item px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle cancel button
+            modal.querySelector('.cancel-edit-item').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Handle delete button
+            modal.querySelector('.delete-item-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (confirm('Tem certeza que deseja excluir este item?')) {
+                    // Remove item from array
+                    checklistItems = checklistItems.filter(i => i.id !== itemId);
+                    
+                    // Update displays
+                    updateChecklistDisplay();
+                    updateDashboardAlerts();
+                    
+                    // Close modal
+                    document.body.removeChild(modal);
+                    
+                    // Show success message
+                    const successMsg = document.createElement('div');
+                    successMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                    successMsg.textContent = 'Item excluído com sucesso!';
+                    document.body.appendChild(successMsg);
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(successMsg)) {
+                            document.body.removeChild(successMsg);
+                        }
+                    }, 3000);
+                }
+            });
+            
+            // Handle form submission
+            document.getElementById('editItemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                item.name = document.getElementById('editItemName').value;
+                item.category = document.getElementById('editItemCategory').value;
+                item.priority = document.getElementById('editItemPriority').value;
+                item.description = document.getElementById('editItemDescription').value;
+                
+                updateChecklistDisplay();
+                closeEditItemModal();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = 'Item atualizado com sucesso!';
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 3000);
+            });
+        }
+
+        function closeEditItemModal() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+
+
+        function toggleChecklistItem(itemId) {
+            const item = checklistItems.find(i => i.id === itemId);
+            if (item) {
+                if (!item.completed) {
+                    // Show completion modal
+                    showCompletionModal(item);
+                } else {
+                    // Just uncheck the item
+                    item.completed = false;
+                    item.auditor = null;
+                    item.status = null;
+                    item.observation = null;
+                    item.photos = [];
+                    updateChecklistDisplay();
+                    updateDashboardAlerts();
+                    
+                    const successMsg = document.createElement('div');
+                    successMsg.className = 'fixed top-4 right-4 bg-orange-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                    successMsg.textContent = 'Item desmarcado';
+                    document.body.appendChild(successMsg);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(successMsg);
+                    }, 2000);
+                }
+            }
+        }
+
+        function showCompletionModal(item) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+                    <div class="p-6 border-b">
+                        <h3 class="text-xl font-bold text-gray-800">Marcar Item como Concluído</h3>
+                        <p class="text-gray-600 text-sm mt-1">${item.name}</p>
+                    </div>
+                    <form id="completionForm" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Auditor Responsável</label>
+                            <select id="auditorSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Selecione o auditor</option>
+                                <option value="João Martins">João Martins</option>
+                                <option value="Maria Clara">Maria Clara</option>
+                                <option value="Pedro Silva">Pedro Silva</option>
+                                <option value="Ana Santos">Ana Santos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status do Item</label>
+                            <select id="statusSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Selecione o status</option>
+                                <option value="ok">✅ OK - Sem problemas</option>
+                                <option value="attention">⚠️ Atenção - Pequenos ajustes necessários</option>
+                                <option value="problem">❌ Problema - Requer ação imediata</option>
+                            </select>
+                        </div>
+                        <div id="observationSection" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Observações do Problema</label>
+                            <textarea id="observationText" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Descreva o problema encontrado..."></textarea>
+                        </div>
+                        <div id="photoSection" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fotos do Problema</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <input type="file" id="photoInput" multiple accept="image/*" class="hidden">
+                                <button type="button" onclick="document.getElementById('photoInput').click()" class="text-blue-600 hover:text-blue-800">
+                                    📷 Adicionar Fotos
+                                </button>
+                                <p class="text-sm text-gray-500 mt-1">Clique para selecionar fotos</p>
+                                <div id="photoPreview" class="mt-3 grid grid-cols-2 gap-2"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" class="cancel-completion px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Marcar como Concluído
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle status change
+            document.getElementById('statusSelect').addEventListener('change', function() {
+                const status = this.value;
+                const observationSection = document.getElementById('observationSection');
+                const photoSection = document.getElementById('photoSection');
+                
+                if (status === 'attention' || status === 'problem') {
+                    observationSection.classList.remove('hidden');
+                    photoSection.classList.remove('hidden');
+                } else {
+                    observationSection.classList.add('hidden');
+                    photoSection.classList.add('hidden');
+                }
+            });
+            
+            // Handle photo selection
+            document.getElementById('photoInput').addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                const preview = document.getElementById('photoPreview');
+                preview.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('div');
+                            img.className = 'relative';
+                            img.innerHTML = `
+                                <img src="${e.target.result}" class="w-full h-20 object-cover rounded border">
+                                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs">×</button>
+                            `;
+                            preview.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+            
+            // Handle cancel
+            modal.querySelector('.cancel-completion').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Handle form submission
+            document.getElementById('completionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const auditor = document.getElementById('auditorSelect').value;
+                const status = document.getElementById('statusSelect').value;
+                const observation = document.getElementById('observationText').value;
+                const photoFiles = document.getElementById('photoInput').files;
+                
+                // Update item
+                item.completed = true;
+                item.auditor = auditor;
+                item.status = status;
+                item.observation = observation || null;
+                item.photos = Array.from(photoFiles).map(file => URL.createObjectURL(file));
+                item.completedAt = new Date().toISOString();
+                
+                updateChecklistDisplay();
+                updateDashboardAlerts();
+                document.body.removeChild(modal);
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = `Item marcado como concluído por ${auditor}!`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 3000);
+            });
+        }
+
+        function updateChecklistDisplay() {
+            // Group items by category
+            const categories = {};
+            checklistItems.forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+
+            // Update the checklist display
+            const checklistContainer = document.querySelector('#checklistTab .space-y-6');
+            if (!checklistContainer) return;
+
+            checklistContainer.innerHTML = '';
+
+            Object.keys(categories).forEach(categoryName => {
+                const items = categories[categoryName];
+                const completedCount = items.filter(item => item.completed).length;
+                const totalCount = items.length;
+                
+                const categoryIcon = getCategoryIcon(categoryName);
+                
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'bg-gray-50 rounded-lg p-4';
+                categoryDiv.innerHTML = `
+                    <h5 class="font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="text-xl mr-2">${categoryIcon}</span>
+                        ${categoryName} (${completedCount}/${totalCount} itens)
+                    </h5>
+                    <div class="space-y-2">
+                        ${items.map(item => `
+                            <div class="bg-white p-4 rounded-lg border-l-4 ${getStatusBorderColor(item.status)}">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-3">
+                                        <input type="checkbox" ${item.completed ? 'checked' : ''} 
+                                               onchange="toggleChecklistItem(${item.id})" 
+                                               class="w-5 h-5 text-green-600">
+                                        <span class="text-gray-800 ${item.completed ? 'line-through text-gray-500' : ''}">${item.name}</span>
+                                        <span class="px-2 py-1 ${getPriorityColor(item.priority)} text-xs rounded-full">${item.priority}</span>
+                                        ${item.status ? `<span class="px-2 py-1 ${getStatusColor(item.status)} text-xs rounded-full">${getStatusText(item.status)}</span>` : ''}
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-${item.completed ? 'green' : 'orange'}-600">${item.completed ? '✓' : '⏳'}</span>
+                                        <button onclick="editChecklistItem(${item.id})" class="text-blue-600 hover:text-blue-800 text-sm">Editar</button>
+                                    </div>
+                                </div>
+                                ${item.completed && item.auditor ? `
+                                    <div class="text-sm text-gray-600 mb-2">
+                                        <span class="font-medium">Auditado por:</span> ${item.auditor}
+                                        <span class="ml-3 text-gray-500">${new Date(item.completedAt).toLocaleString('pt-BR')}</span>
+                                    </div>
+                                ` : ''}
+                                ${item.source === 'marketplace' ? `
+                                    <div class="bg-purple-50 border border-purple-200 rounded p-3 mb-2">
+                                        <p class="text-sm text-purple-800">
+                                            <strong>🛒 Gerado automaticamente:</strong> Baseado nos itens alugados
+                                            ${item.relatedItems ? ` - ${item.relatedItems}` : ''}
+                                            ${item.quantity ? ` (${item.quantity}x)` : ''}
+                                        </p>
+                                    </div>
+                                ` : ''}
+                                ${item.observation ? `
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-2">
+                                        <p class="text-sm text-yellow-800"><strong>Observação:</strong> ${item.observation}</p>
+                                    </div>
+                                ` : ''}
+                                ${item.photos && item.photos.length > 0 ? `
+                                    <div class="flex space-x-2 mt-2">
+                                        ${item.photos.map(photo => `
+                                            <img src="${photo}" class="w-16 h-16 object-cover rounded border cursor-pointer" onclick="showPhotoModal('${photo}')">
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                checklistContainer.appendChild(categoryDiv);
+            });
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Equipamentos': '🎛️',
+                'Estrutura': '🏗️',
+                'Segurança': '🛡️',
+                'Logística': '📦',
+                'Documentação': '📋'
+            };
+            return icons[category] || '📝';
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                'Crítico': 'bg-red-100 text-red-800',
+                'Importante': 'bg-orange-100 text-orange-800',
+                'Normal': 'bg-blue-100 text-blue-800'
+            };
+            return colors[priority] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'ok': 'bg-green-100 text-green-800',
+                'attention': 'bg-yellow-100 text-yellow-800',
+                'problem': 'bg-red-100 text-red-800'
+            };
+            return colors[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'ok': '✅ OK',
+                'attention': '⚠️ Atenção',
+                'problem': '❌ Problema'
+            };
+            return texts[status] || '';
+        }
+
+        function getStatusBorderColor(status) {
+            const colors = {
+                'ok': 'border-green-500',
+                'attention': 'border-yellow-500',
+                'problem': 'border-red-500'
+            };
+            return colors[status] || 'border-gray-300';
+        }
+
+        function showPhotoModal(photoUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="max-w-4xl max-h-[90vh] relative">
+                    <img src="${photoUrl}" class="max-w-full max-h-full object-contain">
+                    <button onclick="this.parentElement.parentElement.remove()" class="absolute top-4 right-4 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold hover:bg-gray-200">
+                        ×
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Close on click outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        function updateDashboardAlerts() {
+            const problemItems = checklistItems.filter(item => 
+                item.completed && (item.status === 'attention' || item.status === 'problem')
+            );
+            
+            const alertCard = document.getElementById('actionRequiredAlert');
+            const alertText = document.getElementById('actionRequiredText');
+            const problemsList = document.getElementById('problemsList');
+            
+            if (problemItems.length > 0) {
+                alertCard.classList.remove('hidden');
+                
+                const problemCount = problemItems.filter(item => item.status === 'problem').length;
+                const attentionCount = problemItems.filter(item => item.status === 'attention').length;
+                
+                let alertMessage = '';
+                if (problemCount > 0 && attentionCount > 0) {
+                    alertMessage = `${problemCount} item(s) com problema e ${attentionCount} item(s) precisam de atenção`;
+                } else if (problemCount > 0) {
+                    alertMessage = `${problemCount} item(s) com problema requerem ação imediata`;
+                } else {
+                    alertMessage = `${attentionCount} item(s) precisam de atenção`;
+                }
+                
+                alertText.textContent = alertMessage;
+                
+                // Update problems list
+                problemsList.innerHTML = problemItems.slice(0, 3).map(item => `
+                    <div class="flex items-center justify-between bg-white p-3 rounded-lg border-l-4 ${getStatusBorderColor(item.status)}">
+                        <div class="flex items-center space-x-3">
+                            <span class="px-2 py-1 ${getStatusColor(item.status)} text-xs rounded-full">${getStatusText(item.status)}</span>
+                            <span class="text-gray-800 font-medium">${item.name}</span>
+                            <span class="text-sm text-gray-500">por ${item.auditor}</span>
+                        </div>
+                        ${item.observation ? `<span class="text-xs text-gray-500 max-w-xs truncate">${item.observation}</span>` : ''}
+                    </div>
+                `).join('');
+                
+                if (problemItems.length > 3) {
+                    problemsList.innerHTML += `
+                        <div class="text-center text-gray-500 text-sm">
+                            E mais ${problemItems.length - 3} item(s)...
+                        </div>
+                    `;
+                }
+            } else {
+                alertCard.classList.add('hidden');
+            }
+        }
+
+        function viewProblemsDetail() {
+            // Switch to events section and open the first event detail
+            showSection('events');
+            setTimeout(() => {
+                if (events.length > 0) {
+                    viewEvent(events[0].id);
+                    // Switch to checklist tab
+                    setTimeout(() => {
+                        showEventTab('checklist');
+                    }, 100);
+                }
+            }, 100);
+        }
+
+        // Utility Functions
+        function scheduleAudit() {
+            alert('Funcionalidade de agendamento de auditoria será implementada aqui!');
+        }
+
+        // Team Management
+        let teamMembers = [
+            {
+                id: 1,
+                name: 'Ana Maria Silva',
+                role: 'Produtora Executiva',
+                responsibility: 'Coordenação Geral',
+                contact: '(11) 99999-9999',
+                email: 'ana@exemplo.com',
+                status: 'Ativo',
+                itemsAssigned: 15
+            }
+        ];
+
+        function addTeamMember() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-gray-800">Adicionar Membro da Equipe</h3>
+                            <button onclick="closeTeamMemberModal()" class="text-gray-500 hover:text-gray-700">
+                                <span class="text-2xl">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <form id="addTeamMemberForm" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                            <input type="text" id="memberName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ex: João Silva" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cargo/Função</label>
+                            <select id="memberRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Selecione o cargo</option>
+                                <option value="Produtor Executivo">Produtor Executivo</option>
+                                <option value="Coordenador de Produção">Coordenador de Produção</option>
+                                <option value="Técnico de Som">Técnico de Som</option>
+                                <option value="Técnico de Iluminação">Técnico de Iluminação</option>
+                                <option value="Coordenador de Segurança">Coordenador de Segurança</option>
+                                <option value="Assistente de Produção">Assistente de Produção</option>
+                                <option value="Coordenador de Logística">Coordenador de Logística</option>
+                                <option value="Responsável por Catering">Responsável por Catering</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div id="customRoleDiv" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Especificar Cargo</label>
+                            <input type="text" id="customRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Digite o cargo específico">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Responsabilidade Principal</label>
+                            <input type="text" id="memberResponsibility" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ex: Coordenação de equipamentos de som" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                            <input type="tel" id="memberContact" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="(11) 99999-9999" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                            <input type="email" id="memberEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="exemplo@email.com" required>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" onclick="closeTeamMemberModal()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Adicionar Membro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle role selection change
+            document.getElementById('memberRole').addEventListener('change', function() {
+                const customRoleDiv = document.getElementById('customRoleDiv');
+                if (this.value === 'Outro') {
+                    customRoleDiv.classList.remove('hidden');
+                    document.getElementById('customRole').required = true;
+                } else {
+                    customRoleDiv.classList.add('hidden');
+                    document.getElementById('customRole').required = false;
+                }
+            });
+            
+            // Handle form submission
+            document.getElementById('addTeamMemberForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const role = document.getElementById('memberRole').value === 'Outro' 
+                    ? document.getElementById('customRole').value 
+                    : document.getElementById('memberRole').value;
+                
+                const newMember = {
+                    id: Date.now(),
+                    name: document.getElementById('memberName').value,
+                    role: role,
+                    responsibility: document.getElementById('memberResponsibility').value,
+                    contact: document.getElementById('memberContact').value,
+                    email: document.getElementById('memberEmail').value,
+                    status: 'Ativo',
+                    itemsAssigned: 0
+                };
+                
+                teamMembers.push(newMember);
+                updateTeamDisplay();
+                closeTeamMemberModal();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = `${newMember.name} foi adicionado à equipe!`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successMsg)) {
+                        document.body.removeChild(successMsg);
+                    }
+                }, 3000);
+            });
+        }
+
+        function closeTeamMemberModal() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        function updateTeamDisplay() {
+            const teamContainer = document.querySelector('#teamTab .grid');
+            if (!teamContainer) return;
+
+            teamContainer.innerHTML = '';
+
+            teamMembers.forEach(member => {
+                const memberCard = document.createElement('div');
+                memberCard.className = 'bg-white border rounded-lg p-4';
+                memberCard.innerHTML = `
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <span class="font-medium">${member.name.split(' ').map(n => n[0]).join('').substring(0, 2)}</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-800">${member.name}</p>
+                            <p class="text-sm text-gray-500">${member.role}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-sm"><span class="font-medium">Responsável por:</span> ${member.responsibility}</p>
+                        <p class="text-sm"><span class="font-medium">Contato:</span> ${member.contact}</p>
+                        <p class="text-sm"><span class="font-medium">E-mail:</span> ${member.email}</p>
+                        <div class="flex space-x-2 mt-3">
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">${member.status}</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${member.itemsAssigned} itens</span>
+                        </div>
+                        <div class="flex space-x-2 mt-3">
+                            <button onclick="editTeamMember(${member.id})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm">
+                                Editar
+                            </button>
+                            <button onclick="removeTeamMember(${member.id})" class="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 text-sm">
+                                Remover
+                            </button>
+                        </div>
+                    </div>
+                `;
+                teamContainer.appendChild(memberCard);
+            });
+        }
+
+        function editTeamMember(memberId) {
+            const member = teamMembers.find(m => m.id === memberId);
+            if (!member) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6 border-b">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-gray-800">Editar Membro da Equipe</h3>
+                            <button onclick="closeTeamMemberModal()" class="text-gray-500 hover:text-gray-700">
+                                <span class="text-2xl">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <form id="editTeamMemberForm" class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                            <input type="text" id="editMemberName" value="${member.name}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cargo/Função</label>
+                            <input type="text" id="editMemberRole" value="${member.role}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Responsabilidade Principal</label>
+                            <input type="text" id="editMemberResponsibility" value="${member.responsibility}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                            <input type="tel" id="editMemberContact" value="${member.contact}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                            <input type="email" id="editMemberEmail" value="${member.email}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" onclick="closeTeamMemberModal()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Handle form submission
+            document.getElementById('editTeamMemberForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                member.name = document.getElementById('editMemberName').value;
+                member.role = document.getElementById('editMemberRole').value;
+                member.responsibility = document.getElementById('editMemberResponsibility').value;
+                member.contact = document.getElementById('editMemberContact').value;
+                member.email = document.getElementById('editMemberEmail').value;
+                
+                updateTeamDisplay();
+                closeTeamMemberModal();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = `Dados de ${member.name} atualizados!`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successMsg)) {
+                        document.body.removeChild(successMsg);
+                    }
+                }, 3000);
+            });
+        }
+
+        function removeTeamMember(memberId) {
+            const member = teamMembers.find(m => m.id === memberId);
+            if (member && confirm(`Tem certeza que deseja remover ${member.name} da equipe?`)) {
+                teamMembers = teamMembers.filter(m => m.id !== memberId);
+                updateTeamDisplay();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = `${member.name} foi removido da equipe`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successMsg)) {
+                        document.body.removeChild(successMsg);
+                    }
+                }, 3000);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Tem certeza que deseja limpar todos os dados salvos? Esta ação não pode ser desfeita.')) {
+                localStorage.removeItem('showready_events');
+                events = [];
+                alert('Todos os dados foram limpos! A página será recarregada.');
+                location.reload();
+            }
+        }
+
+        // Theme functions
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            const body = document.body;
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (isDarkTheme) {
+                body.classList.add('dark');
+                themeButton.textContent = '☀️ Claro';
+                localStorage.setItem('showready_theme', 'dark');
+            } else {
+                body.classList.remove('dark');
+                themeButton.textContent = '🌙 Escuro';
+                localStorage.setItem('showready_theme', 'light');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('showready_theme');
+            if (savedTheme === 'dark') {
+                isDarkTheme = true;
+                document.body.classList.add('dark');
+                document.getElementById('themeToggle').textContent = '☀️ Claro';
+            }
+        }
+
+        // Marketplace functionality
+        let cart = [];
+        let currentCategory = 'all';
+        let allProducts = [
+            // Som
+            { id: 1, name: 'Mesa de Som Digital 32 Canais', category: 'som', price: 800, icon: '🎛️', description: 'Ideal para shows e festivais de médio porte', location: 'São Paulo' },
+            { id: 2, name: 'Sistema de Caixas Line Array', category: 'som', price: 1500, icon: '🔊', description: 'Sistema profissional para grandes eventos', location: 'São Paulo' },
+            { id: 3, name: 'Microfones Sem Fio (Kit 8 unidades)', category: 'som', price: 400, icon: '🎤', description: 'Microfones profissionais UHF', location: 'Rio de Janeiro' },
+            { id: 4, name: 'Subwoofer Ativo 18"', category: 'som', price: 600, icon: '🔊', description: 'Graves potentes para shows', location: 'São Paulo' },
+            { id: 5, name: 'Monitor de Palco (Par)', category: 'som', price: 300, icon: '📢', description: 'Retorno para artistas', location: 'Belo Horizonte' },
+            
+            // Iluminação
+            { id: 6, name: 'Kit Iluminação LED Profissional', category: 'iluminacao', price: 1200, icon: '💡', description: '12 refletores LED + controladora DMX', location: 'Rio de Janeiro' },
+            { id: 7, name: 'Moving Head LED (Par)', category: 'iluminacao', price: 800, icon: '🌟', description: 'Iluminação móvel profissional', location: 'São Paulo' },
+            { id: 8, name: 'Laser Show RGB', category: 'iluminacao', price: 1000, icon: '🌈', description: 'Efeitos laser coloridos', location: 'Brasília' },
+            { id: 9, name: 'Strobo LED 1000W', category: 'iluminacao', price: 250, icon: '⚡', description: 'Efeito estroboscópico potente', location: 'São Paulo' },
+            { id: 10, name: 'Fumaça Low Fog', category: 'iluminacao', price: 350, icon: '🌫️', description: 'Máquina de fumaça baixa', location: 'Rio de Janeiro' },
+            
+            // Estrutura
+            { id: 11, name: 'Palco Modular 8x6m', category: 'estrutura', price: 2500, icon: '🎪', description: 'Estrutura completa com cobertura', location: 'São Paulo' },
+            { id: 12, name: 'Tenda 10x10m', category: 'estrutura', price: 800, icon: '⛺', description: 'Tenda para área VIP ou catering', location: 'Belo Horizonte' },
+            { id: 13, name: 'Arquibancada Modular (50 lugares)', category: 'estrutura', price: 1200, icon: '🏟️', description: 'Estrutura para plateia', location: 'São Paulo' },
+            { id: 14, name: 'Camarim Móvel', category: 'estrutura', price: 600, icon: '🚪', description: 'Estrutura para artistas', location: 'Rio de Janeiro' },
+            { id: 15, name: 'Gradil de Segurança (100m)', category: 'estrutura', price: 400, icon: '🚧', description: 'Isolamento de área', location: 'São Paulo' },
+            
+            // Transporte
+            { id: 16, name: 'Caminhão Baú 3/4', category: 'transporte', price: 500, icon: '🚚', description: 'Transporte de equipamentos', location: 'São Paulo' },
+            { id: 17, name: 'Van para Equipe (15 lugares)', category: 'transporte', price: 300, icon: '🚐', description: 'Transporte de pessoal', location: 'Rio de Janeiro' },
+            { id: 18, name: 'Ônibus Executivo (40 lugares)', category: 'transporte', price: 800, icon: '🚌', description: 'Transporte VIP', location: 'São Paulo' },
+            { id: 19, name: 'Empilhadeira', category: 'transporte', price: 400, icon: '🏗️', description: 'Movimentação de carga pesada', location: 'Belo Horizonte' },
+            
+            // Catering
+            { id: 20, name: 'Buffet Completo (100 pessoas)', category: 'catering', price: 1500, icon: '🍽️', description: 'Refeição completa para equipe', location: 'São Paulo' },
+            { id: 21, name: 'Coffee Break (50 pessoas)', category: 'catering', price: 400, icon: '☕', description: 'Lanche para intervalos', location: 'Rio de Janeiro' },
+            { id: 22, name: 'Bar Móvel com Barman', category: 'catering', price: 800, icon: '🍹', description: 'Serviço de bar completo', location: 'São Paulo' },
+            { id: 23, name: 'Churrasqueira Profissional', category: 'catering', price: 300, icon: '🔥', description: 'Equipamento para churrasco', location: 'Belo Horizonte' },
+            
+            // Segurança
+            { id: 24, name: 'Equipe de Segurança (10 pessoas)', category: 'seguranca', price: 2000, icon: '🛡️', description: 'Segurança profissional por 8h', location: 'São Paulo' },
+            { id: 25, name: 'Sistema de Câmeras (8 câmeras)', category: 'seguranca', price: 600, icon: '📹', description: 'Monitoramento completo', location: 'Rio de Janeiro' },
+            { id: 26, name: 'Detector de Metal', category: 'seguranca', price: 200, icon: '🚪', description: 'Controle de acesso', location: 'São Paulo' },
+            { id: 27, name: 'Rádio Comunicador (Kit 10 unidades)', category: 'seguranca', price: 150, icon: '📻', description: 'Comunicação da equipe', location: 'Brasília' }
+        ];
+
+        function showCategory(category) {
+            currentCategory = category;
+            updateProductsGrid();
+            
+            // Update category buttons visual state
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'border-blue-500');
+                btn.classList.add('bg-white');
+            });
+            
+            if (category !== 'all') {
+                event.target.closest('.category-btn').classList.remove('bg-white');
+                event.target.closest('.category-btn').classList.add('bg-blue-100', 'border-blue-500');
+            }
+        }
+
+        function showAllProducts() {
+            currentCategory = 'all';
+            updateProductsGrid();
+            
+            // Reset category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'border-blue-500');
+                btn.classList.add('bg-white');
+            });
+        }
+
+        function updateProductsGrid() {
+            const grid = document.getElementById('productsGrid');
+            let productsToShow = allProducts;
+            
+            // Filter by category
+            if (currentCategory !== 'all') {
+                productsToShow = allProducts.filter(product => product.category === currentCategory);
+            }
+            
+            grid.innerHTML = '';
+            
+            productsToShow.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white border rounded-lg p-4 hover:shadow-lg transition-shadow';
+                productCard.innerHTML = `
+                    <div class="w-full h-32 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                        <span class="text-4xl">${product.icon}</span>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-2">${product.name}</h4>
+                    <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-gray-500">📍 ${product.location}</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${getCategoryName(product.category)}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-blue-600">R$ ${product.price.toLocaleString()}/dia</span>
+                        <button onclick="addToCart(${product.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            🛒 Alugar
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(productCard);
+            });
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'som': 'Som',
+                'iluminacao': 'Iluminação',
+                'estrutura': 'Estrutura',
+                'transporte': 'Transporte',
+                'catering': 'Catering',
+                'seguranca': 'Segurança'
+            };
+            return names[category] || category;
+        }
+
+        function addToCart(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (product) {
+                const existingItem = cart.find(item => item.id === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        ...product,
+                        quantity: 1
+                    });
+                }
+                
+                updateCartDisplay();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = `${product.name} adicionado ao carrinho!`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 2000);
+            }
+        }
+
+        function updateCartDisplay() {
+            const cartBadge = document.getElementById('cartBadge');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            // Update badge
+            if (cart.length > 0) {
+                cartBadge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartBadge.classList.remove('hidden');
+            } else {
+                cartBadge.classList.add('hidden');
+            }
+            
+            // Update cart items
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <span class="text-4xl mb-4 block">🛒</span>
+                        <p>Seu carrinho está vazio</p>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">${item.icon}</span>
+                            <div>
+                                <h5 class="font-medium text-gray-800">${item.name}</h5>
+                                <p class="text-sm text-gray-500">R$ ${item.price.toLocaleString()}/dia</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-8 h-8 bg-gray-300 hover:bg-gray-400 rounded-full flex items-center justify-center text-sm">-</button>
+                                <span class="w-8 text-center">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center text-sm">+</button>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-600 hover:text-red-800 text-sm">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Update total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `R$ ${total.toLocaleString()},00`;
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartDisplay();
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function clearCart() {
+            if (confirm('Tem certeza que deseja limpar o carrinho?')) {
+                cart = [];
+                updateCartDisplay();
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // Generate automatic checklists based on rented items
+            generateAutomaticChecklists();
+            
+            // Store rental costs
+            storeRentalCosts(total, cart);
+            
+            alert(`Pedido finalizado!\n\n${itemCount} item(s) no valor total de R$ ${total.toLocaleString()},00\n\nChecklists automáticos foram gerados baseados nos itens alugados!\n\nEm breve você receberá um e-mail com os detalhes do pedido e instruções para pagamento.`);
+            
+            // Clear cart after checkout
+            cart = [];
+            updateCartDisplay();
+            toggleCart();
+            
+            // Update displays
+            updateChecklistDisplay();
+            updateDashboardAlerts();
+            updateRentalCostsDisplay();
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const priceRange = document.getElementById('priceFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            
+            let filteredProducts = allProducts;
+            
+            // Filter by category
+            if (currentCategory !== 'all') {
+                filteredProducts = filteredProducts.filter(product => product.category === currentCategory);
+            }
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by price range
+            if (priceRange) {
+                if (priceRange === '0-500') {
+                    filteredProducts = filteredProducts.filter(product => product.price <= 500);
+                } else if (priceRange === '500-1000') {
+                    filteredProducts = filteredProducts.filter(product => product.price > 500 && product.price <= 1000);
+                } else if (priceRange === '1000-2000') {
+                    filteredProducts = filteredProducts.filter(product => product.price > 1000 && product.price <= 2000);
+                } else if (priceRange === '2000+') {
+                    filteredProducts = filteredProducts.filter(product => product.price > 2000);
+                }
+            }
+            
+            // Filter by location
+            if (location) {
+                const locationNames = {
+                    'sao-paulo': 'São Paulo',
+                    'rio-janeiro': 'Rio de Janeiro',
+                    'belo-horizonte': 'Belo Horizonte',
+                    'brasilia': 'Brasília'
+                };
+                filteredProducts = filteredProducts.filter(product => product.location === locationNames[location]);
+            }
+            
+            // Update grid with filtered products
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500">
+                        <span class="text-4xl mb-4 block">🔍</span>
+                        <p>Nenhum produto encontrado com os filtros selecionados</p>
+                        <button onclick="clearFilters()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                            Limpar Filtros
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white border rounded-lg p-4 hover:shadow-lg transition-shadow';
+                productCard.innerHTML = `
+                    <div class="w-full h-32 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                        <span class="text-4xl">${product.icon}</span>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-2">${product.name}</h4>
+                    <p class="text-gray-600 text-sm mb-3">${product.description}</p>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-gray-500">📍 ${product.location}</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${getCategoryName(product.category)}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-lg font-bold text-blue-600">R$ ${product.price.toLocaleString()}/dia</span>
+                        <button onclick="addToCart(${product.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            🛒 Alugar
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(productCard);
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('priceFilter').value = '';
+            document.getElementById('locationFilter').value = '';
+            updateProductsGrid();
+        }
+
+        function showHelp() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 fade-in';
+            modal.innerHTML = `
+                <div class="card-enhanced max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto scale-in">
+                    <div class="gradient-primary text-white p-8 rounded-t-2xl">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-3xl">💬</span>
+                                <h3 class="text-2xl font-bold">Ajuda e Suporte</h3>
+                            </div>
+                            <button onclick="closeHelp()" class="text-white hover:text-gray-200 text-2xl">×</button>
+                        </div>
+                        <p class="text-blue-100 mt-2">Guia rápido para usar o ShowReady</p>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <div class="glass rounded-2xl p-6">
+                            <h4 class="font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">📊</span>
+                                Dashboard
+                            </h4>
+                            <p class="text-gray-600">Visualize estatísticas dos seus eventos, alertas importantes e custos de aluguel do marketplace.</p>
+                        </div>
+                        
+                        <div class="glass rounded-2xl p-6">
+                            <h4 class="font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">📅</span>
+                                Eventos
+                            </h4>
+                            <p class="text-gray-600">Crie e gerencie seus eventos. Cada evento possui checklist automático, auditoria e controle de equipe.</p>
+                        </div>
+                        
+                        <div class="glass rounded-2xl p-6">
+                            <h4 class="font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">👥</span>
+                                Auditores
+                            </h4>
+                            <p class="text-gray-600">Encontre e contrate auditores certificados para garantir a qualidade dos seus eventos.</p>
+                        </div>
+                        
+                        <div class="glass rounded-2xl p-6">
+                            <h4 class="font-bold text-lg mb-3 flex items-center">
+                                <span class="mr-2">🛒</span>
+                                Marketplace
+                            </h4>
+                            <p class="text-gray-600">Alugue equipamentos e serviços. Checklists automáticos são gerados baseados nos itens alugados.</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                            <h4 class="font-bold text-blue-800 mb-3">💡 Dicas Importantes</h4>
+                            <ul class="text-blue-700 space-y-2 text-sm">
+                                <li>• Todos os dados são salvos automaticamente no seu navegador</li>
+                                <li>• Use o tema escuro para trabalhar em ambientes com pouca luz</li>
+                                <li>• Checklists são gerados automaticamente baseados nos itens do marketplace</li>
+                                <li>• Acompanhe os alertas no dashboard para itens que precisam de atenção</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function closeHelp() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-50.fade-in');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        // Form Handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme(); // Load saved theme
+            loadEvents(); // Load saved events from localStorage
+            loadAuditors(); // Load saved auditors from localStorage
+            loadRentalCosts(); // Load saved rental costs
+            showSection('dashboard');
+            
+            // Initialize displays
+            updateDashboardAlerts(); // Initialize dashboard alerts
+            updateRentalCostsDisplay(); // Initialize rental costs display
+            
+            // Initialize marketplace
+            updateProductsGrid();
+            updateCartDisplay();
+            
+            // Add Auditor Form Handler
+            document.getElementById('addAuditorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const editingId = this.dataset.editingId;
+                const isEditing = !!editingId;
+                
+                const auditorData = {
+                    name: document.getElementById('auditorName').value,
+                    title: document.getElementById('auditorTitle').value,
+                    location: document.getElementById('auditorLocation').value,
+                    specialty: document.getElementById('auditorSpecialty').value,
+                    experience: parseInt(document.getElementById('auditorExperience').value),
+                    price: parseInt(document.getElementById('auditorPrice').value),
+                    rating: parseFloat(document.getElementById('auditorRating').value),
+                    phone: document.getElementById('auditorPhone').value,
+                    email: document.getElementById('auditorEmail').value,
+                    certifications: document.getElementById('auditorCertifications').value
+                };
+                
+                if (isEditing) {
+                    // Update existing auditor
+                    const auditor = auditors.find(a => a.id === parseInt(editingId));
+                    if (auditor) {
+                        Object.assign(auditor, auditorData);
+                    }
+                    
+                    // Reset form state
+                    delete this.dataset.editingId;
+                    document.querySelector('#addAuditorModal h3').textContent = 'Adicionar Novo Auditor';
+                    document.querySelector('#addAuditorForm button[type="submit"]').textContent = 'Adicionar Auditor';
+                } else {
+                    // Add new auditor
+                    const newAuditor = {
+                        id: Date.now(),
+                        ...auditorData
+                    };
+                    auditors.push(newAuditor);
+                }
+                
+                saveAuditors();
+                updateAuditorsGrid();
+                closeAddAuditor();
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                successMsg.textContent = isEditing ? 
+                    `${auditorData.name} foi atualizado com sucesso!` : 
+                    `${auditorData.name} foi adicionado à lista de auditores!`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    if (document.body.contains(successMsg)) {
+                        document.body.removeChild(successMsg);
+                    }
+                }, 3000);
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9888e1de57f6caee',t:'MTc1OTQ1NzIwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
